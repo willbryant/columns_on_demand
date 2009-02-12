@@ -1,0 +1,33 @@
+ColumnsOnDemand
+===============
+
+Lazily loads large columns on demand.
+
+By default, does this for all TEXT (:text) and BLOB (:binary) columns, but a list
+of specific columns to load on demand can be given.
+
+This is useful to reduce the memory taken by Rails when loading a number of records
+that have large columns if those particular columns are actually not required most
+of the time.  In this situation it can also greatly reduce the database query time
+because loading large BLOB/TEXT columns generally means seeking to other database
+pages since they are not stored wholly in the record's page itself.
+
+
+Example
+=======
+
+# Example.find(:all) will exclude the file_data and processing_log columns from the
+# SELECT query, and example.file_data and example.processing_log will load & cache
+# that individual column value for the record instance.
+class Example
+  columns_on_demand :file_data, :processing_log
+end
+
+# Scans the 'examples' table columns and registers all TEXT (:text) and BLOB (:binary)
+# columns for loading on demand.
+class Example
+  columns_on_demand
+end
+
+
+Copyright (c) 2008-2009 Will Bryant, Sekuda Ltd, released under the MIT license

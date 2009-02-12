@@ -1,0 +1,10 @@
+mysql:
+  adapter: mysql
+  database: columns_on_demand_test
+  username: root
+postgresql:
+  adapter: postgresql
+  database: columns_on_demand_test
+sqlite3:
+  adapter: sqlite3
+  database: columns_on_demand_test

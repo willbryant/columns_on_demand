@@ -1,0 +1,10 @@
+first_file:
+  original_filename: somefile.txt
+  file_data: This is the file data!
+  processing_log: "Processing somefile.txt\n
+    Processing header\n
+    Processed header\n
+    Processing footer\n
+    Processed footer\n"
+  results: Processed 0 entries OK
+  processed_at: 2008-12-23 21:38:10
