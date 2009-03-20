@@ -14,4 +14,13 @@ ActiveRecord::Schema.define(:version => 0) do
     t.text     :results
     t.datetime :processed_at
   end
+  
+  create_table :parents, :force => true do |t|
+    t.text     :info
+  end
+  
+  create_table :children, :force => true do |t|
+    t.integer  :parent_id, :null => false
+    t.text     :test_data
+  end
 end

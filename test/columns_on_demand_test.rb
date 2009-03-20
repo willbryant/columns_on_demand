@@ -9,12 +9,24 @@ class Implicit < ActiveRecord::Base
   columns_on_demand
 end
 
+class Parent < ActiveRecord::Base
+  columns_on_demand
+  
+  has_many :children
+end
+
+class Child < ActiveRecord::Base
+  columns_on_demand
+  
+  belongs_to :parent
+end
+
 class ColumnsOnDemandTest < ActiveSupport::TestCase
   def assert_not_loaded(record, attr_name)
     assert_equal nil, record.instance_variable_get("@attributes")[attr_name.to_s]
   end
   
-  fixtures :implicits
+  fixtures :all
   self.use_transactional_fixtures = true
   
   test "it lists explicitly given columns for loading on demand" do
@@ -155,5 +167,19 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
 
     assert_equal "id, type, some_field", Sti.default_select(false)
     assert_equal "id, type, big_field",  StiChild.default_select(false)
+  end
+  
+  test "it works on child records loaded from associations" do
+    parent = parents(:some_parent)
+    child = parent.children.find(:first)
+    assert_not_loaded child, "test_data"
+    assert_equal "Some test data", child.test_data
+  end
+  
+  test "it works on parent records loaded from associations" do
+    child = children(:a_child_of_some_parent)
+    parent = child.parent
+    assert_not_loaded parent, "info"
+    assert_equal "Here's some info.", parent.info
   end
 end
