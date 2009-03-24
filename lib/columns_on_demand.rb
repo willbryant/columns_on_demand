@@ -4,8 +4,6 @@ module ColumnsOnDemand
       class_inheritable_accessor :columns_to_load_on_demand, :instance_writer => false
       self.columns_to_load_on_demand = columns_to_load_on_demand.empty? ? blob_and_text_columns : columns_to_load_on_demand.collect(&:to_s)
 
-      # cattr_accessor :columns_to_select, :instance_writer => false # lazily initialized itself, so we can be compiled without db and redo if column information is reset
-      
       extend ClassMethods
       include InstanceMethods
       
