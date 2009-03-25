@@ -12,6 +12,9 @@ of the time.  In this situation it can also greatly reduce the database query ti
 because loading large BLOB/TEXT columns generally means seeking to other database
 pages since they are not stored wholly in the record's page itself.
 
+Although this plugin is mainly used for BLOB and TEXT columns, it will actually
+work on all types - and is just as useful for large string fields etc.
+
 
 Example
 =======
