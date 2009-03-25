@@ -31,7 +31,7 @@ module ColumnsOnDemand
   
   module ClassMethods
     def default_select(qualified)
-      @columns_to_select ||= columns.collect(&:name) - columns_to_load_on_demand
+      @columns_to_select ||= (columns.collect(&:name) - columns_to_load_on_demand).collect {|attr_name| connection.quote_column_name(attr_name)}
       if qualified
         quoted_table_name + '.' + @columns_to_select.join(", #{quoted_table_name}.")
       else

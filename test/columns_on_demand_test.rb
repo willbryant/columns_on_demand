@@ -38,10 +38,10 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
   
   test "it selects all the other columns for loading eagerly" do
-    assert_equal "id, results, processed_at", Explicit.default_select(false)
+    assert_match /\W*id\W*, \W*results\W*, \W*processed_at\W*/, Explicit.default_select(false)
     assert_match /\W*explicits\W*.results/, Explicit.default_select(true)
     
-    assert_equal "id, original_filename, processed_at", Implicit.default_select(false)
+    assert_match /\W*id\W*, \W*original_filename\W*, \W*processed_at\W*/, Implicit.default_select(false)
     assert_match /\W*implicits\W*.original_filename/, Implicit.default_select(true)
   end
   
@@ -133,7 +133,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
       columns_on_demand
     end
 
-    assert_equal "id, some_field", Dummy.default_select(false)
+    assert_match /\W*id\W*, \W*some_field\W*/, Dummy.default_select(false)
 
     ActiveRecord::Schema.define(:version => 2) do
       create_table :dummies, :force => true do |t|
@@ -143,9 +143,9 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
       end
     end
 
-    assert_equal "id, some_field", Dummy.default_select(false)
+    assert_match /\W*id\W*, \W*some_field\W*/, Dummy.default_select(false)
     Dummy.reset_column_information
-    assert_equal "id, some_field, another_field", Dummy.default_select(false)
+    assert_match /\W*id\W*, \W*some_field\W*, \W*another_field\W*/, Dummy.default_select(false)
   end
   
   test "it handles STI models" do
@@ -165,8 +165,8 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
       columns_on_demand :some_field
     end
 
-    assert_equal "id, type, some_field", Sti.default_select(false)
-    assert_equal "id, type, big_field",  StiChild.default_select(false)
+    assert_match /\W*id\W*, \W*type\W*, \W*some_field\W*/, Sti.default_select(false)
+    assert_match /\W*id\W*, \W*type\W*, \W*big_field\W*/,  StiChild.default_select(false)
   end
   
   test "it works on child records loaded from associations" do
