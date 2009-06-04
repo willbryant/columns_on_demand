@@ -182,4 +182,18 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     assert_not_loaded parent, "info"
     assert_equal "Here's some info.", parent.info
   end
+  
+  test "it doesn't break validates_presence_of" do
+    class ValidatedImplicit < ActiveRecord::Base
+      set_table_name "implicits"
+      columns_on_demand
+      validates_presence_of :original_filename, :file_data, :results
+    end
+    
+    assert !ValidatedImplicit.new(:original_filename => "test.txt").valid?
+    instance = ValidatedImplicit.create!(:original_filename => "test.txt", :file_data => "test file data", :results => "test results")
+    instance.update_attributes!({}) # file_data and results are already loaded
+    new_instance = ValidatedImplicit.find(instance.id)
+    new_instance.update_attributes!({}) # file_data and results aren't loaded yet, but will be loaded to validate
+  end
 end
