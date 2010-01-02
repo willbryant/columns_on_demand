@@ -23,4 +23,8 @@ ActiveRecord::Schema.define(:version => 0) do
     t.integer  :parent_id, :null => false
     t.text     :test_data
   end
+  
+  create_table :serializings, :force => true do |t|
+    t.binary   :data
+  end
 end

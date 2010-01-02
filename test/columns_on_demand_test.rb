@@ -196,4 +196,31 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     new_instance = ValidatedImplicit.find(instance.id)
     new_instance.update_attributes!({}) # file_data and results aren't loaded yet, but will be loaded to validate
   end
+  
+  test "it works with serialized columns" do
+    class Serializing < ActiveRecord::Base
+      columns_on_demand
+      serialize :data
+    end
+    
+    data = {:foo => '1', :bar => '2', :baz => '3'}
+    original_record = Serializing.create!(:data => data)
+    assert_equal data, original_record.data
+    
+    record = Serializing.find(:first)
+    assert_not_loaded record, "data"
+    assert_equal data, record.data
+    assert_equal false, record.data_changed?
+    assert_equal false, record.changed?
+    assert_equal data, record.data
+    
+    record.data = "replacement"
+    assert_equal true, record.data_changed?
+    assert_equal true, record.changed?
+    record.save!
+    
+    record = Serializing.find(:first)
+    assert_not_loaded record, "data"
+    assert_equal "replacement", record.data
+  end
 end

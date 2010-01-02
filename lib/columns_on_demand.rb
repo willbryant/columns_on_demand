@@ -12,6 +12,7 @@ module ColumnsOnDemand
       end
       alias_method_chain   :attribute_names,          :columns_on_demand
       alias_method_chain   :read_attribute,           :columns_on_demand
+      alias_method_chain   :unserialize_attribute,    :columns_on_demand
       alias_method_chain   :missing_attribute,        :columns_on_demand
       alias_method_chain   :reload,                   :columns_on_demand
     end
@@ -54,9 +55,18 @@ module ColumnsOnDemand
       attr_names.each_with_index {|attr_name, i| @attributes[attr_name] = row[i]}
     end
     
-    def read_attribute_with_columns_on_demand(attr_name)
+    def ensure_loaded(attr_name)
       load_attributes(attr_name.to_s) unless @attributes.has_key?(attr_name.to_s) || !columns_to_load_on_demand.include?(attr_name.to_s)
+    end
+    
+    def read_attribute_with_columns_on_demand(attr_name)
+      ensure_loaded(attr_name)
       read_attribute_without_columns_on_demand(attr_name)
+    end
+
+    def unserialize_attribute_with_columns_on_demand(attr_name)
+      ensure_loaded(attr_name)
+      unserialize_attribute_without_columns_on_demand(attr_name)
     end
 
     def missing_attribute_with_columns_on_demand(attr_name, *args)
