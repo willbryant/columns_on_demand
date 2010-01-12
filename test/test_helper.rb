@@ -6,11 +6,17 @@ else
 end
 
 require 'test/unit'
-require 'ruby-debug' rescue nil
 require 'active_support'
 require 'active_support/test_case'
 require 'active_record'
 require 'active_record/fixtures'
+
+begin
+  require 'ruby-debug'
+  Debugger.start
+rescue
+  # ruby-debug not installed, no debugging for you
+end
 
 raise "use RAILS_ENV=mysql or RAILS_ENV=postgresql to test this plugin" if ENV['RAILS_ENV'].blank?
 FileUtils.mkdir File.join(File.dirname(__FILE__), "log") rescue nil
