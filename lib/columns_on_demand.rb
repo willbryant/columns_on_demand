@@ -9,7 +9,7 @@ module ColumnsOnDemand
 
       if respond_to?(:scoped)
         relation # set up @relation
-        @relation.class_eval do # but always modify @relation, not the temporary returned by .relation if there's a where(type condition)
+        class << @relation # but always modify @relation, not the temporary returned by .relation if there's a where(type condition)
           def build_select_with_columns_on_demand(arel, selects)
             unless selects.empty?
               build_select_without_columns_on_demand(arel, selects)
