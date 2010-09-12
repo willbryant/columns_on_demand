@@ -98,7 +98,8 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   
   test "it doesn't override custom :select finds" do
     record = Implicit.find(:first, :select => "id, file_data")
-    assert_raise ActiveRecord::MissingAttributeError do
+    klass = ActiveModel.const_defined?(:MissingAttributeError) ? ActiveModel::MissingAttributeError : ActiveRecord::MissingAttributeError
+    assert_raise klass do
       record.processed_at # explicitly not loaded, overriding default
     end
     assert_equal "This is the file data!", record.instance_variable_get("@attributes")["file_data"] # already loaded, overriding default

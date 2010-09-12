@@ -6,6 +6,20 @@ module ColumnsOnDemand
 
       extend ClassMethods
       include InstanceMethods
+
+      if respond_to?(:scoped)
+        relation # set up @relation
+        @relation.class_eval do # but always modify @relation, not the temporary returned by .relation if there's a where(type condition)
+          def build_select_with_columns_on_demand(arel, selects)
+            unless selects.empty?
+              build_select_without_columns_on_demand(arel, selects)
+            else
+              arel.project(Arel::SqlLiteral.new(@klass.default_select(true)))
+            end
+          end
+          alias_method_chain :build_select, :columns_on_demand
+        end
+      end
       
       class <<self
         alias_method_chain :reset_column_information, :columns_on_demand
@@ -31,6 +45,7 @@ module ColumnsOnDemand
   end
   
   module ClassMethods
+    # this is the method API as called by ActiveRecord 2.x.  we also call it ourselves above in our ActiveRecord 3 extensions.
     def default_select(qualified)
       @columns_to_select ||= (columns.collect(&:name) - columns_to_load_on_demand).collect {|attr_name| connection.quote_column_name(attr_name)}
       if qualified
