@@ -19,8 +19,6 @@ rescue LoadError
 end
 
 raise "use RAILS_ENV=mysql or RAILS_ENV=postgresql to test this plugin" if ENV['RAILS_ENV'].blank?
-FileUtils.mkdir File.join(File.dirname(__FILE__), "log") rescue nil
-RAILS_DEFAULT_LOGGER = ActiveRecord::Base.logger = Logger.new(File.join(File.dirname(__FILE__), "log", "#{ENV['RAILS_ENV']}.log"))
 
 ActiveRecord::Base.configurations = YAML::load(IO.read(File.join(File.dirname(__FILE__), "database.yml")))
 ActiveRecord::Base.establish_connection ActiveRecord::Base.configurations[ENV['RAILS_ENV']]

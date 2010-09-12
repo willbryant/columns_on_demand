@@ -78,7 +78,7 @@ module ColumnsOnDemand
     end
     
     def reload_with_columns_on_demand(*args)
-      returning reload_without_columns_on_demand(*args) do
+      reload_without_columns_on_demand(*args).tap do
         columns_to_load_on_demand.each {|attr_name| @attributes.delete(attr_name)}
       end
     end
