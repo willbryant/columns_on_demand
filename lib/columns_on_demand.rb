@@ -7,7 +7,7 @@ module ColumnsOnDemand
       extend ClassMethods
       include InstanceMethods
 
-      if respond_to?(:scoped)
+      if ActiveRecord::VERSION::MAJOR > 2
         relation # set up @relation
         class << @relation # but always modify @relation, not the temporary returned by .relation if there's a where(type condition)
           def build_select_with_columns_on_demand(arel, selects)
