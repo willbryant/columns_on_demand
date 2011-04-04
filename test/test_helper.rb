@@ -25,4 +25,4 @@ ActiveRecord::Base.establish_connection ActiveRecord::Base.configurations[ENV['R
 ActiveSupport::TestCase.send(:include, ActiveRecord::TestFixtures) if ActiveRecord.const_defined?('TestFixtures')
 ActiveSupport::TestCase.fixture_path = File.join(File.dirname(__FILE__), "fixtures")
 
-require 'init' # load columns_on_demand
+require File.expand_path(File.join(File.dirname(__FILE__), '../init')) # load columns_on_demand

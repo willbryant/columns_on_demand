@@ -1,5 +1,5 @@
-require 'test_helper'
-require 'schema'
+require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
+require File.expand_path(File.join(File.dirname(__FILE__), 'schema'))
 
 class Explicit < ActiveRecord::Base
   columns_on_demand :file_data, :processing_log, :original_filename
