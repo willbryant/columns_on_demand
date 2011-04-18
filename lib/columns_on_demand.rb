@@ -22,13 +22,14 @@ module ColumnsOnDemand
       end
       
       class <<self
-        alias_method_chain :reset_column_information, :columns_on_demand
+        alias_method_chain :reset_column_information,        :columns_on_demand
       end
-      alias_method_chain   :attribute_names,          :columns_on_demand
-      alias_method_chain   :read_attribute,           :columns_on_demand
-      alias_method_chain   :unserialize_attribute,    :columns_on_demand
-      alias_method_chain   :missing_attribute,        :columns_on_demand
-      alias_method_chain   :reload,                   :columns_on_demand
+      alias_method_chain   :attribute_names,                 :columns_on_demand
+      alias_method_chain   :read_attribute,                  :columns_on_demand
+      alias_method_chain   :read_attribute_before_type_cast, :columns_on_demand
+      alias_method_chain   :unserialize_attribute,           :columns_on_demand
+      alias_method_chain   :missing_attribute,               :columns_on_demand
+      alias_method_chain   :reload,                          :columns_on_demand
     end
     
     def reset_column_information_with_columns_on_demand
@@ -77,6 +78,11 @@ module ColumnsOnDemand
     def read_attribute_with_columns_on_demand(attr_name)
       ensure_loaded(attr_name)
       read_attribute_without_columns_on_demand(attr_name)
+    end
+
+    def read_attribute_before_type_cast_with_columns_on_demand(attr_name)
+      ensure_loaded(attr_name)
+      read_attribute_before_type_cast_without_columns_on_demand(attr_name)
     end
 
     def unserialize_attribute_with_columns_on_demand(attr_name)
