@@ -1,0 +1,3 @@
+a_child_of_some_parent:
+  parent: some_parent
+  test_data: Some test data
