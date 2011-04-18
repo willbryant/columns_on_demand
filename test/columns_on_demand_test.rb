@@ -75,6 +75,13 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     assert_equal record.read_attribute(:results).object_id, record.read_attribute("results").object_id # should not have to re-find
   end
   
+  test "it loads the column when accessed using read_attribute_before_type_cast" do
+    record = Implicit.find(:first)
+    assert_equal "This is the file data!", record.read_attribute_before_type_cast("file_data")
+    assert_equal "Processed 0 entries OK", record.read_attribute_before_type_cast("results")
+    # read_attribute_before_type_cast doesn't tolerate symbol arguments as read_attribute does
+  end
+  
   test "it loads the column when generating #attributes" do
     attributes = Implicit.find(:first).attributes
     assert_equal "This is the file data!", attributes["file_data"]
