@@ -21,10 +21,11 @@ rescue LoadError
   # ruby-debug not installed, no debugging for you
 end
 
-raise "use RAILS_ENV=mysql or RAILS_ENV=postgresql to test this plugin" if ENV['RAILS_ENV'].blank?
-
 ActiveRecord::Base.configurations = YAML::load(IO.read(File.join(File.dirname(__FILE__), "database.yml")))
-ActiveRecord::Base.establish_connection ActiveRecord::Base.configurations[ENV['RAILS_ENV']]
+configuration = ActiveRecord::Base.configurations[ENV['RAILS_ENV']]
+raise "use RAILS_ENV=#{ActiveRecord::Base.configurations.keys.sort.join '/'} to test this plugin" unless configuration
+ActiveRecord::Base.establish_connection configuration
+
 ActiveSupport::TestCase.send(:include, ActiveRecord::TestFixtures) if ActiveRecord.const_defined?('TestFixtures')
 ActiveSupport::TestCase.fixture_path = File.join(File.dirname(__FILE__), "fixtures")
 

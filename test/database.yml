@@ -7,4 +7,4 @@ postgresql:
   database: columns_on_demand_test
 sqlite3:
   adapter: sqlite3
-  database: columns_on_demand_test
+  database: /tmp/columns_on_demand_test.db
