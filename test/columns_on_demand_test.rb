@@ -88,8 +88,8 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
   
   test "it loads the column when generating #to_json" do
-    json = Implicit.find(:first)
-    assert_equal "This is the file data!", ActiveSupport::JSON.decode(json["file_data"])
+    json = Implicit.find(:first).to_json
+    assert_equal "This is the file data!", ActiveSupport::JSON.decode(json)["implicit"]["file_data"]
   end
   
   test "it clears the column on reload, and can load it again" do
