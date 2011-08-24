@@ -5,6 +5,9 @@ else
   require 'rubygems'
 end
 
+gem 'activesupport', ENV['RAILS_VERSION']
+gem 'activerecord',  ENV['RAILS_VERSION']
+
 require 'test/unit'
 require 'active_support'
 require 'active_support/test_case'
