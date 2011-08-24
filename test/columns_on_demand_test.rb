@@ -92,6 +92,14 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     assert_equal "This is the file data!", ActiveSupport::JSON.decode(json)["implicit"]["file_data"]
   end
   
+  test "it loads the column for #clone" do
+    record = Implicit.find(:first).clone
+    assert_equal "This is the file data!", record.file_data
+
+    record = Implicit.find(:first).clone.tap(&:save!)
+    assert_equal "This is the file data!", Implicit.find(record.id).file_data
+  end
+  
   test "it clears the column on reload, and can load it again" do
     record = Implicit.find(:first)
     old_object_id = record.file_data.object_id
