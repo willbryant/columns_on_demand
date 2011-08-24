@@ -88,6 +88,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
   
   test "it loads the column when generating #to_json" do
+    ActiveRecord::Base.include_root_in_json = true
     json = Implicit.find(:first).to_json
     assert_equal "This is the file data!", ActiveSupport::JSON.decode(json)["implicit"]["file_data"]
   end
@@ -113,7 +114,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   
   test "it doesn't override custom :select finds" do
     record = Implicit.find(:first, :select => "id, file_data")
-    klass = ActiveModel.const_defined?(:MissingAttributeError) ? ActiveModel::MissingAttributeError : ActiveRecord::MissingAttributeError
+    klass = ActiveRecord.const_defined?(:MissingAttributeError) ? ActiveRecord::MissingAttributeError : ActiveModel::MissingAttributeError
     assert_raise klass do
       record.processed_at # explicitly not loaded, overriding default
     end
