@@ -24,6 +24,7 @@ module ColumnsOnDemand
       class <<self
         alias_method_chain :reset_column_information,        :columns_on_demand
       end
+      alias_method_chain   :attributes,                      :columns_on_demand
       alias_method_chain   :attribute_names,                 :columns_on_demand
       alias_method_chain   :read_attribute,                  :columns_on_demand
       alias_method_chain   :read_attribute_before_type_cast, :columns_on_demand
@@ -58,11 +59,17 @@ module ColumnsOnDemand
   end
   
   module InstanceMethods
+    def attributes_with_columns_on_demand
+      load_attributes(*columns_to_load_on_demand.select {|column| @attributes[column].nil?})
+      attributes_without_columns_on_demand
+    end
+
     def attribute_names_with_columns_on_demand
       (attribute_names_without_columns_on_demand + columns_to_load_on_demand).uniq.sort
     end
     
     def load_attributes(*attr_names)
+      return if attr_names.blank?
       values = connection.select_rows(
         "SELECT #{attr_names.collect {|attr_name| connection.quote_column_name(attr_name)}.join(", ")}" +
         "  FROM #{self.class.quoted_table_name}" +

@@ -1,5 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 require File.expand_path(File.join(File.dirname(__FILE__), 'schema'))
+require File.expand_path(File.join(File.dirname(__FILE__), 'activerecord_count_queries'))
 
 class Explicit < ActiveRecord::Base
   columns_on_demand :file_data, :processing_log, :original_filename
@@ -21,7 +22,7 @@ class Child < ActiveRecord::Base
   belongs_to :parent
 end
 
-class ColumnsOnDemandTest < ActiveSupport::TestCase
+class ColumnsOnDemandTest < ActiveRecord::TestCase
   def assert_not_loaded(record, attr_name)
     assert_equal nil, record.instance_variable_get("@attributes")[attr_name.to_s]
   end
@@ -85,6 +86,15 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   test "it loads the column when generating #attributes" do
     attributes = Implicit.find(:first).attributes
     assert_equal "This is the file data!", attributes["file_data"]
+  end
+
+  test "loads all the columns in one query when generating #attributes" do
+    record = Implicit.find(:first)
+    assert_queries(1) do
+      attributes = record.attributes
+      assert_equal "This is the file data!", attributes["file_data"]
+      assert !attributes["processing_log"].blank?
+    end
   end
   
   test "it loads the column when generating #to_json" do
