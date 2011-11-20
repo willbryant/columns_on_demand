@@ -75,7 +75,10 @@ module ColumnsOnDemand
         "  FROM #{self.class.quoted_table_name}" +
         " WHERE #{connection.quote_column_name(self.class.primary_key)} = #{quote_value(id, self.class.columns_hash[self.class.primary_key])}")
       row = values.first || raise(ActiveRecord::RecordNotFound, "Couldn't find #{self.class.name} with ID=#{id}")
-      attr_names.each_with_index {|attr_name, i| @attributes[attr_name] = row[i]}
+      attr_names.each_with_index do |attr_name, i|
+        @attributes[attr_name] = row[i]
+        unserialize_attribute_without_columns_on_demand(attr_name) if self.class.serialized_attributes.include?(attr_name)
+      end
     end
     
     def ensure_loaded(attr_name)
