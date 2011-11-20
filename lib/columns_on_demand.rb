@@ -1,7 +1,7 @@
 module ColumnsOnDemand
   module BaseMethods
     def columns_on_demand(*columns_to_load_on_demand)
-      class_inheritable_accessor :columns_to_load_on_demand, :instance_writer => false
+      class_attribute :columns_to_load_on_demand, :instance_writer => false
       self.columns_to_load_on_demand = columns_to_load_on_demand.empty? ? blob_and_text_columns : columns_to_load_on_demand.collect(&:to_s)
 
       extend ClassMethods
