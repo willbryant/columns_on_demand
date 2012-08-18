@@ -1,4 +1,4 @@
 .DS_Store
-columns-on-demand-*.gem
+columns_on_demand-*.gem
 Gemfile.lock
 test/columns_on_demand_test.db

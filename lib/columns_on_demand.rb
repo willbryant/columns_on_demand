@@ -141,3 +141,5 @@ module ColumnsOnDemand
     end
   end
 end
+
+ActiveRecord::Base.send(:extend, ColumnsOnDemand::BaseMethods)
