@@ -24,7 +24,7 @@ end
 
 class ColumnsOnDemandTest < ActiveRecord::TestCase
   def assert_not_loaded(record, attr_name)
-    assert_equal nil, record.instance_variable_get("@attributes")[attr_name.to_s]
+    assert !record.instance_variable_get("@attributes").has_key?(attr_name.to_s)
   end
   
   fixtures :all
