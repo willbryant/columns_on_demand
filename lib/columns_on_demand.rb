@@ -59,8 +59,16 @@ module ColumnsOnDemand
   end
   
   module InstanceMethods
+    def columns_loaded
+      @columns_loaded ||= Set.new
+    end
+
+    def column_loaded?(attr_name)
+      !columns_to_load_on_demand.include?(attr_name) || !@attributes[attr_name].nil? || new_record? || columns_loaded.include?(attr_name)
+    end
+
     def attributes_with_columns_on_demand
-      load_attributes(*columns_to_load_on_demand.select {|column| @attributes[column].nil?})
+      load_attributes(*columns_to_load_on_demand.reject {|attr_name| column_loaded?(attr_name)})
       attributes_without_columns_on_demand
     end
 
@@ -76,13 +84,14 @@ module ColumnsOnDemand
         " WHERE #{connection.quote_column_name(self.class.primary_key)} = #{quote_value(id, self.class.columns_hash[self.class.primary_key])}")
       row = values.first || raise(ActiveRecord::RecordNotFound, "Couldn't find #{self.class.name} with ID=#{id}")
       attr_names.each_with_index do |attr_name, i|
+        columns_loaded << attr_name
         @attributes[attr_name] = row[i]
         unserialize_attribute_without_columns_on_demand(attr_name) if self.class.serialized_attributes.include?(attr_name)
       end
     end
     
     def ensure_loaded(attr_name)
-      load_attributes(attr_name.to_s) unless @attributes.has_key?(attr_name.to_s) || !columns_to_load_on_demand.include?(attr_name.to_s)
+      load_attributes(attr_name.to_s) unless column_loaded?(attr_name.to_s)
     end
     
     def read_attribute_with_columns_on_demand(attr_name)
@@ -110,6 +119,7 @@ module ColumnsOnDemand
     
     def reload_with_columns_on_demand(*args)
       reload_without_columns_on_demand(*args).tap do
+        columns_loaded.clear
         columns_to_load_on_demand.each {|attr_name| @attributes.delete(attr_name)}
       end
     end

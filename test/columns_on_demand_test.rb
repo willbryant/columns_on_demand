@@ -24,7 +24,11 @@ end
 
 class ColumnsOnDemandTest < ActiveRecord::TestCase
   def assert_not_loaded(record, attr_name)
-    assert !record.instance_variable_get("@attributes").has_key?(attr_name.to_s)
+    assert !record.column_loaded?(attr_name.to_s)
+  end
+  
+  def assert_loaded(record, attr_name)
+    assert record.column_loaded?(attr_name.to_s)
   end
   
   fixtures :all
@@ -66,6 +70,22 @@ class ColumnsOnDemandTest < ActiveRecord::TestCase
 
     record = Implicit.find(:all).first
     assert_not_equal nil, record.file_data
+  end
+
+  test "it loads the columns only once even if nil" do
+    record = Implicit.find(:first)
+    assert_not_loaded record, "file_data"
+    assert_equal "This is the file data!", record.file_data
+    assert_loaded record, "file_data"
+    Implicit.update_all(:file_data => nil)
+
+    record = Implicit.find(:first)
+    assert_not_loaded record, "file_data"
+    assert_equal nil, record.file_data
+    assert_loaded record, "file_data"
+    assert_no_queries do
+      assert_equal nil, record.file_data
+    end
   end
   
   test "it loads the column when accessed using read_attribute" do
