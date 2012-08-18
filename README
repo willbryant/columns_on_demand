@@ -16,6 +16,13 @@ Although this plugin is mainly used for BLOB and TEXT columns, it will actually
 work on all types - and is just as useful for large string fields etc.
 
 
+Compatibility
+=============
+
+Currently tested against 2.3.14, 3.0.17, 3.1.8, and 3.2.8.  Note that 3.0 and 3.1
+have ActiveRecord regressions that will affect sqlite users.
+
+
 Example
 =======
 
@@ -33,4 +40,4 @@ class Example
 end
 
 
-Copyright (c) 2008-2010 Will Bryant, Sekuda Ltd, released under the MIT license
+Copyright (c) 2008-2012 Will Bryant, Sekuda Ltd, released under the MIT license
