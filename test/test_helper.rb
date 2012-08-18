@@ -5,6 +5,7 @@ else
   require 'rubygems'
 end
 
+puts "Rails: #{ENV['RAILS_VERSION'] || 'default'}"
 gem 'activesupport', ENV['RAILS_VERSION']
 gem 'activerecord',  ENV['RAILS_VERSION']
 
