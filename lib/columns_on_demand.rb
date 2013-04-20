@@ -7,20 +7,6 @@ module ColumnsOnDemand
       extend ClassMethods
       include InstanceMethods
 
-      if ActiveRecord::VERSION::MAJOR > 2
-        relation # set up @relation
-        class << @relation # but always modify @relation, not the temporary returned by .relation if there's a where(type condition)
-          def build_select_with_columns_on_demand(arel, selects)
-            unless selects.empty?
-              build_select_without_columns_on_demand(arel, selects)
-            else
-              arel.project(Arel::SqlLiteral.new(@klass.default_select(true)))
-            end
-          end
-          alias_method_chain :build_select, :columns_on_demand
-        end
-      end
-      
       class <<self
         unless ActiveRecord.const_defined?(:AttributeMethods) &&
                ActiveRecord::AttributeMethods::const_defined?(:Serialization) &&
@@ -140,6 +126,20 @@ module ColumnsOnDemand
       end
     end
   end
+
+  module RelationMethods
+    def build_select_with_columns_on_demand(arel, selects)
+      if selects.empty?
+        build_select_without_columns_on_demand(arel, default_select(true))
+      else
+        build_select_without_columns_on_demand(arel, selects)
+      end
+    end
+  end
 end
 
 ActiveRecord::Base.send(:extend, ColumnsOnDemand::BaseMethods)
+if ActiveRecord.const_defined?(:Relation)
+  ActiveRecord::Relation.send(:include, ColumnsOnDemand::RelationMethods)
+  ActiveRecord::Relation.alias_method_chain :build_select, :columns_on_demand
+end
