@@ -129,7 +129,7 @@ module ColumnsOnDemand
 
   module RelationMethods
     def build_select_with_columns_on_demand(arel, selects)
-      if selects.empty?
+      if selects.empty? && respond_to?(:default_select)
         build_select_without_columns_on_demand(arel, default_select(true))
       else
         build_select_without_columns_on_demand(arel, selects)
