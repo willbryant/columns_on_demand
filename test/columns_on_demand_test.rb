@@ -22,7 +22,7 @@ class Child < ActiveRecord::Base
   belongs_to :parent
 end
 
-class ColumnsOnDemandTest < ActiveRecord::TestCase
+class ColumnsOnDemandTest < ActiveSupport::TestCase
   def assert_not_loaded(record, attr_name)
     assert !record.column_loaded?(attr_name.to_s)
   end
@@ -31,6 +31,17 @@ class ColumnsOnDemandTest < ActiveRecord::TestCase
     assert record.column_loaded?(attr_name.to_s)
   end
   
+  def assert_queries(num = 1)
+    ::SQLCounter.clear_log
+    yield
+  ensure
+    assert_equal num, ::SQLCounter.log.size, "#{::SQLCounter.log.size} instead of #{num} queries were executed.#{::SQLCounter.log.size == 0 ? '' : "\nQueries:\n#{::SQLCounter.log.join("\n")}"}"
+  end
+
+  def assert_no_queries(&block)
+    assert_queries(0, &block)
+  end
+
   fixtures :all
   self.use_transactional_fixtures = true
   
