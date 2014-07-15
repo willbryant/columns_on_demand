@@ -243,7 +243,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   
   test "it doesn't break validates_presence_of" do
     class ValidatedImplicit < ActiveRecord::Base
-      set_table_name "implicits"
+      self.table_name = "implicits"
       columns_on_demand
       validates_presence_of :original_filename, :file_data, :results
     end

@@ -26,10 +26,7 @@ Compatibility
 
 Supports mysql, mysql2, postgresql, and sqlite3.
 
-Currently tested against Rails 3.2.13 and 3.1.8, on Ruby 1.8.7 and 2.0.0p0.
-Was also tested compatible with 2.3.14 and 3.0.17.
-
-Note that 3.0 and 3.1 have ActiveRecord regressions that will affect sqlite users.
+Currently tested against Rails 3.2.18, 4.0.8, and 4.1.4, on Ruby 2.0.0.
 EOF
   gem.has_rdoc     = false
   gem.author       = "Will Bryant"

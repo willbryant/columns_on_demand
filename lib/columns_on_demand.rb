@@ -74,10 +74,10 @@ module ColumnsOnDemand
     
     def load_attributes(*attr_names)
       return if attr_names.blank?
-      values = connection.select_rows(
-        "SELECT #{attr_names.collect {|attr_name| connection.quote_column_name(attr_name)}.join(", ")}" +
+      values = self.class.connection.select_rows(
+        "SELECT #{attr_names.collect {|attr_name| self.class.connection.quote_column_name(attr_name)}.join(", ")}" +
         "  FROM #{self.class.quoted_table_name}" +
-        " WHERE #{connection.quote_column_name(self.class.primary_key)} = #{quote_value(id, self.class.columns_hash[self.class.primary_key])}")
+        " WHERE #{self.class.connection.quote_column_name(self.class.primary_key)} = #{self.class.quote_value(id, self.class.columns_hash[self.class.primary_key])}")
       row = values.first || raise(ActiveRecord::RecordNotFound, "Couldn't find #{self.class.name} with ID=#{id}")
       attr_names.each_with_index do |attr_name, i|
         columns_loaded << attr_name
@@ -101,9 +101,9 @@ module ColumnsOnDemand
       load_attributes(attr_name.to_s) unless column_loaded?(attr_name.to_s)
     end
     
-    def read_attribute_with_columns_on_demand(attr_name)
+    def read_attribute_with_columns_on_demand(attr_name, &block)
       ensure_loaded(attr_name)
-      read_attribute_without_columns_on_demand(attr_name)
+      read_attribute_without_columns_on_demand(attr_name, &block)
     end
 
     def read_attribute_before_type_cast_with_columns_on_demand(attr_name)
@@ -130,7 +130,7 @@ module ColumnsOnDemand
   module RelationMethods
     def build_select_with_columns_on_demand(arel, selects)
       if selects.empty? && klass < ColumnsOnDemand::InstanceMethods
-        build_select_without_columns_on_demand(arel, default_select(true))
+        build_select_without_columns_on_demand(arel, [default_select(true)])
       else
         build_select_without_columns_on_demand(arel, selects)
       end
