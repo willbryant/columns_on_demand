@@ -62,35 +62,35 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
   
   test "it doesn't load the columns_to_load_on_demand straight away when finding the records" do
-    record = Implicit.find(:first)
+    record = Implicit.first
     assert_not_equal nil, record
     assert_not_loaded record, "file_data"
     assert_not_loaded record, "processing_log"
 
-    record = Implicit.find(:all).first
+    record = Implicit.all.to_a.first
     assert_not_equal nil, record
     assert_not_loaded record, "file_data"
     assert_not_loaded record, "processing_log"
   end
   
   test "it loads the columns when accessed as an attribute" do
-    record = Implicit.find(:first)
+    record = Implicit.first
     assert_equal "This is the file data!", record.file_data
     assert_equal "Processed 0 entries OK", record.results
     assert_equal record.results.object_id, record.results.object_id # should not have to re-find
 
-    record = Implicit.find(:all).first
+    record = Implicit.all.to_a.first
     assert_not_equal nil, record.file_data
   end
 
   test "it loads the columns only once even if nil" do
-    record = Implicit.find(:first)
+    record = Implicit.first
     assert_not_loaded record, "file_data"
     assert_equal "This is the file data!", record.file_data
     assert_loaded record, "file_data"
     Implicit.update_all(:file_data => nil)
 
-    record = Implicit.find(:first)
+    record = Implicit.first
     assert_not_loaded record, "file_data"
     assert_equal nil, record.file_data
     assert_loaded record, "file_data"
@@ -100,7 +100,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
   
   test "it loads the column when accessed using read_attribute" do
-    record = Implicit.find(:first)
+    record = Implicit.first
     assert_equal "This is the file data!", record.read_attribute(:file_data)
     assert_equal "This is the file data!", record.read_attribute("file_data")
     assert_equal "Processed 0 entries OK", record.read_attribute("results")
@@ -108,19 +108,19 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
   
   test "it loads the column when accessed using read_attribute_before_type_cast" do
-    record = Implicit.find(:first)
+    record = Implicit.first
     assert_equal "This is the file data!", record.read_attribute_before_type_cast("file_data")
     assert_equal "Processed 0 entries OK", record.read_attribute_before_type_cast("results")
     # read_attribute_before_type_cast doesn't tolerate symbol arguments as read_attribute does
   end
   
   test "it loads the column when generating #attributes" do
-    attributes = Implicit.find(:first).attributes
+    attributes = Implicit.first.attributes
     assert_equal "This is the file data!", attributes["file_data"]
   end
 
   test "loads all the columns in one query when generating #attributes" do
-    record = Implicit.find(:first)
+    record = Implicit.first
     assert_queries(1) do
       attributes = record.attributes
       assert_equal "This is the file data!", attributes["file_data"]
@@ -130,20 +130,20 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   
   test "it loads the column when generating #to_json" do
     ActiveRecord::Base.include_root_in_json = true
-    json = Implicit.find(:first).to_json
+    json = Implicit.first.to_json
     assert_equal "This is the file data!", ActiveSupport::JSON.decode(json)["implicit"]["file_data"]
   end
   
   test "it loads the column for #clone" do
-    record = Implicit.find(:first).clone
+    record = Implicit.first.clone
     assert_equal "This is the file data!", record.file_data
 
-    record = Implicit.find(:first).clone.tap(&:save!)
+    record = Implicit.first.clone.tap(&:save!)
     assert_equal "This is the file data!", Implicit.find(record.id).file_data
   end
   
   test "it clears the column on reload, and can load it again" do
-    record = Implicit.find(:first)
+    record = Implicit.first
     old_object_id = record.file_data.object_id
     Implicit.update_all(:file_data => "New file data")
 
@@ -153,8 +153,8 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     assert_equal "New file data", record.file_data
   end
   
-  test "it doesn't override custom :select finds" do
-    record = Implicit.find(:first, :select => "id, file_data")
+  test "it doesn't override custom select() finds" do
+    record = Implicit.select("id, file_data").first
     klass = ActiveRecord.const_defined?(:MissingAttributeError) ? ActiveRecord::MissingAttributeError : ActiveModel::MissingAttributeError
     assert_raise klass do
       record.processed_at # explicitly not loaded, overriding default
@@ -163,7 +163,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
   
   test "it raises normal ActiveRecord::RecordNotFound if the record is deleted before the column load" do
-    record = Implicit.find(:first)
+    record = Implicit.first
     Implicit.delete_all
     
     assert_raise ActiveRecord::RecordNotFound do
@@ -172,7 +172,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
   
   test "it doesn't raise on column access if the record is deleted after the column load" do
-    record = Implicit.find(:first)
+    record = Implicit.first
     record.file_data
     Implicit.delete_all
     
@@ -229,7 +229,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   
   test "it works on child records loaded from associations" do
     parent = parents(:some_parent)
-    child = parent.children.find(:first)
+    child = parent.children.first
     assert_not_loaded child, "test_data"
     assert_equal "Some test data", child.test_data
   end
@@ -265,7 +265,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     original_record = Serializing.create!(:data => data)
     assert_equal data, original_record.data
     
-    record = Serializing.find(:first)
+    record = Serializing.first
     assert_not_loaded record, "data"
     assert_equal data, record.data
     assert_equal false, record.data_changed?
@@ -277,7 +277,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     assert_equal true, record.changed?
     record.save!
     
-    record = Serializing.find(:first)
+    record = Serializing.first
     assert_not_loaded record, "data"
     assert_equal "replacement", record.data
   end
