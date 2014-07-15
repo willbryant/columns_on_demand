@@ -6,6 +6,7 @@ else
 end
 
 puts "Rails: #{ENV['RAILS_VERSION'] || 'default'}"
+puts "Env: #{ENV['RAILS_ENV'] || 'not set'}"
 gem 'activesupport', ENV['RAILS_VERSION']
 gem 'activerecord',  ENV['RAILS_VERSION']
 

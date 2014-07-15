@@ -109,7 +109,12 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   
   test "it loads the column when accessed using read_attribute_before_type_cast" do
     record = Implicit.first
-    assert_equal "This is the file data!", record.read_attribute_before_type_cast("file_data")
+    if Implicit.connection.class.name =~ /PostgreSQL/ && ActiveRecord::VERSION::MAJOR >= 4
+      # newer versions of activerecord show the encoded binary format used for blob columns in postgresql in the before_type_cast output, whereas older ones had already decoded that
+      assert_equal "\\x54686973206973207468652066696c65206461746121", record.read_attribute_before_type_cast("file_data")
+    else
+      assert_equal "This is the file data!", record.read_attribute_before_type_cast("file_data")
+    end
     assert_equal "Processed 0 entries OK", record.read_attribute_before_type_cast("results")
     # read_attribute_before_type_cast doesn't tolerate symbol arguments as read_attribute does
   end
@@ -159,7 +164,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     assert_raise klass do
       record.processed_at # explicitly not loaded, overriding default
     end
-    assert_equal "This is the file data!", record.instance_variable_get("@attributes")["file_data"] # already loaded, overriding default
+    assert_loaded record, :file_data
   end
   
   test "it raises normal ActiveRecord::RecordNotFound if the record is deleted before the column load" do
