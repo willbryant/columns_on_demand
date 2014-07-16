@@ -84,6 +84,13 @@ module ColumnsOnDemand
         @attributes[attr_name] = row[i]
 
         if coder = self.class.serialized_attributes[attr_name]
+          # for some database adapters, @column_types_override gets populated with type data from query used to load the record originally.
+          # this is fine, but unfortunately some special-case "decorate_columns" code in ActiveRecord will wrap those types in serialization
+          # objects, and it does this for each column listed in @serialized_column_names *even if they are not present in the query results*.
+          # as a result it unfortunately overrides the normal @column_type with a @column_type_override with a nil @column, which explodes
+          # when it tries to run the typecast.  make it use the normal @column_type value, since we know that we've loading the regular column.
+          @column_types_override.delete(attr_name) if @column_types_override
+
           if ActiveRecord.const_defined?(:AttributeMethods) &&
              ActiveRecord::AttributeMethods::const_defined?(:Serialization) &&
              ActiveRecord::AttributeMethods::Serialization::Attribute
