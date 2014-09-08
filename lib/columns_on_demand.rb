@@ -60,7 +60,7 @@ module ColumnsOnDemand
     end
 
     def column_loaded?(attr_name)
-      !columns_to_load_on_demand.include?(attr_name) || !@attributes[attr_name].nil? || new_record? || columns_loaded.include?(attr_name)
+      !columns_to_load_on_demand.include?(attr_name) || @attributes.key?(attr_name) || new_record? || columns_loaded.include?(attr_name)
     end
 
     def attributes_with_columns_on_demand
