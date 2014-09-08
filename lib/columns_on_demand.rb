@@ -8,9 +8,10 @@ module ColumnsOnDemand
       include InstanceMethods
 
       class <<self
-        unless ActiveRecord.const_defined?(:AttributeMethods) &&
+        unless ActiveRecord::VERSION::MAJOR > 3 ||
+              (ActiveRecord.const_defined?(:AttributeMethods) &&
                ActiveRecord::AttributeMethods::const_defined?(:Serialization) &&
-               ActiveRecord::AttributeMethods::Serialization::Attribute
+               ActiveRecord::AttributeMethods::Serialization::const_defined?(:Attribute))
           alias_method_chain :define_read_method_for_serialized_attribute, :columns_on_demand
         end
         alias_method_chain :reset_column_information,        :columns_on_demand
@@ -21,6 +22,7 @@ module ColumnsOnDemand
       alias_method_chain   :read_attribute_before_type_cast, :columns_on_demand
       alias_method_chain   :missing_attribute,               :columns_on_demand
       alias_method_chain   :reload,                          :columns_on_demand
+      alias_method_chain   :changed_in_place?,               :columns_on_demand if ActiveRecord::AttributeMethods::Dirty.instance_methods.include?(:changed_attributes)
     end
     
     def reset_column_information_with_columns_on_demand
@@ -74,16 +76,23 @@ module ColumnsOnDemand
     
     def load_attributes(*attr_names)
       return if attr_names.blank?
+
       values = self.class.connection.select_rows(
         "SELECT #{attr_names.collect {|attr_name| self.class.connection.quote_column_name(attr_name)}.join(", ")}" +
         "  FROM #{self.class.quoted_table_name}" +
         " WHERE #{self.class.connection.quote_column_name(self.class.primary_key)} = #{self.class.quote_value(id, self.class.columns_hash[self.class.primary_key])}")
       row = values.first || raise(ActiveRecord::RecordNotFound, "Couldn't find #{self.class.name} with ID=#{id}")
+
       attr_names.each_with_index do |attr_name, i|
         columns_loaded << attr_name
-        @attributes[attr_name] = row[i]
+        value = row[i]
 
-        if coder = self.class.serialized_attributes[attr_name]
+        if @attributes.respond_to?(:write_from_database)
+          # activerecord 4.2 or later, which make it easy to replicate the normal typecasting and deserialization logic
+          @attributes.write_from_database(attr_name, value)
+
+        elsif coder = self.class.serialized_attributes[attr_name]
+          # activerecord 4.1 or earlier, with a serialized column
           # for some database adapters, @column_types_override gets populated with type data from query used to load the record originally.
           # this is fine, but unfortunately some special-case "decorate_columns" code in ActiveRecord will wrap those types in serialization
           # objects, and it does this for each column listed in @serialized_column_names *even if they are not present in the query results*.
@@ -93,13 +102,19 @@ module ColumnsOnDemand
 
           if ActiveRecord.const_defined?(:AttributeMethods) &&
              ActiveRecord::AttributeMethods::const_defined?(:Serialization) &&
-             ActiveRecord::AttributeMethods::Serialization::Attribute
+             ActiveRecord::AttributeMethods::Serialization::const_defined?(:Attribute)
             # in 3.2 @attributes has a special Attribute struct to help cache both serialized and unserialized forms
-            @attributes[attr_name] = ActiveRecord::AttributeMethods::Serialization::Attribute.new(coder, @attributes[attr_name], :serialized)
+            @attributes[attr_name] = ActiveRecord::AttributeMethods::Serialization::Attribute.new(coder, value, :serialized)
           elsif ActiveRecord::VERSION::MAJOR == 3 && ActiveRecord::VERSION::MINOR == 1
-            # in 2.3 an 3.0, @attributes has the serialized form; from 3.1 it has the deserialized form
-            @attributes[attr_name] = coder.load @attributes[attr_name]
+            # from 3.1 it has the deserialized form
+            @attributes[attr_name] = coder.load value
+          else
+            # in 2.3 an 3.0, @attributes has the serialized form
+            @attributes[attr_name] = value
           end
+        else
+          # activerecord 4.1 or earlier, with a regular unserialized column
+          @attributes[attr_name] = value
         end
       end
     end
@@ -108,6 +123,10 @@ module ColumnsOnDemand
       load_attributes(attr_name.to_s) unless column_loaded?(attr_name.to_s)
     end
     
+    def changed_in_place_with_columns_on_demand?(attr_name)
+      column_loaded?(attr_name) && changed_in_place_without_columns_on_demand?(attr_name)
+    end
+
     def read_attribute_with_columns_on_demand(attr_name, &block)
       ensure_loaded(attr_name)
       read_attribute_without_columns_on_demand(attr_name, &block)
@@ -129,7 +148,15 @@ module ColumnsOnDemand
     def reload_with_columns_on_demand(*args)
       reload_without_columns_on_demand(*args).tap do
         columns_loaded.clear
-        columns_to_load_on_demand.each {|attr_name| @attributes.delete(attr_name)}
+        columns_to_load_on_demand.each do |attr_name|
+          if @attributes.respond_to?(:reset)
+            # 4.2 and above
+            @attributes.reset(attr_name)
+          else
+            # 4.1 and earlier
+            @attributes.delete(attr_name)
+          end
+        end
       end
     end
   end
