@@ -24,11 +24,11 @@ end
 
 class ColumnsOnDemandTest < ActiveSupport::TestCase
   def assert_not_loaded(record, attr_name)
-    assert !record.column_loaded?(attr_name.to_s)
+    assert !record.column_loaded?(attr_name.to_s), "Record should not have the #{attr_name} column loaded, but did"
   end
   
   def assert_loaded(record, attr_name)
-    assert record.column_loaded?(attr_name.to_s)
+    assert record.column_loaded?(attr_name.to_s), "Record should have the #{attr_name} column loaded, but didn't"
   end
   
   def assert_queries(num = 1)
@@ -272,10 +272,14 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     
     record = Serializing.first
     assert_not_loaded record, "data"
+    assert_equal false, record.data_changed?
+
+    assert_not_loaded record, "data"
     assert_equal data, record.data
     assert_equal false, record.data_changed?
     assert_equal false, record.changed?
     assert_equal data, record.data
+    assert_equal data, record.data_was
     
     record.data = "replacement"
     assert_equal true, record.data_changed?
