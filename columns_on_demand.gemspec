@@ -32,12 +32,13 @@ EOF
   gem.author       = "Will Bryant"
   gem.email        = "will.bryant@gmail.com"
   gem.homepage     = "http://github.com/willbryant/columns_on_demand"
-  
+  gem.license      = "MIT"
+
   gem.executables  = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files        = `git ls-files`.split("\n")
   gem.test_files   = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.require_path = "lib"
-  
+
   gem.add_dependency "activerecord"
   gem.add_development_dependency "rake"
   gem.add_development_dependency "mysql"
