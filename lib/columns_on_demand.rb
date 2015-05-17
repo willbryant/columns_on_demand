@@ -20,9 +20,16 @@ module ColumnsOnDemand
       alias_method_chain   :attribute_names,                 :columns_on_demand
       alias_method_chain   :read_attribute,                  :columns_on_demand
       alias_method_chain   :read_attribute_before_type_cast, :columns_on_demand
+      if ActiveRecord::AttributeMethods::Read.instance_methods.include?(:_read_attribute)
+        alias_method_chain :_read_attribute,                 :columns_on_demand
+      end
       alias_method_chain   :missing_attribute,               :columns_on_demand
       alias_method_chain   :reload,                          :columns_on_demand
-      alias_method_chain   :changed_in_place?,               :columns_on_demand if ActiveRecord::AttributeMethods::Dirty.instance_methods.include?(:changed_attributes)
+      if ActiveRecord::AttributeMethods::Dirty.instance_methods.include?(:changed_attributes)
+        alias_method_chain :attribute_changed_in_place?,     :columns_on_demand
+      elsif ActiveRecord::AttributeMethods::Dirty.instance_methods.include?(:changed_attributes)
+        alias_method_chain :changed_in_place?,               :columns_on_demand
+      end
     end
     
     def reset_column_information_with_columns_on_demand
@@ -118,13 +125,17 @@ module ColumnsOnDemand
         end
       end
     end
-    
+
     def ensure_loaded(attr_name)
       load_attributes(attr_name.to_s) unless column_loaded?(attr_name.to_s)
     end
-    
+
     def changed_in_place_with_columns_on_demand?(attr_name)
       column_loaded?(attr_name) && changed_in_place_without_columns_on_demand?(attr_name)
+    end
+
+    def attribute_changed_in_place_with_columns_on_demand?(attr_name)
+      column_loaded?(attr_name) && attribute_changed_in_place_without_columns_on_demand?(attr_name)
     end
 
     def read_attribute_with_columns_on_demand(attr_name, &block)
@@ -137,6 +148,11 @@ module ColumnsOnDemand
       read_attribute_before_type_cast_without_columns_on_demand(attr_name)
     end
 
+    def _read_attribute_with_columns_on_demand(attr_name, &block)
+      ensure_loaded(attr_name)
+      _read_attribute_without_columns_on_demand(attr_name, &block)
+    end
+
     def missing_attribute_with_columns_on_demand(attr_name, *args)
       if columns_to_load_on_demand.include?(attr_name)
         load_attributes(attr_name)
@@ -144,7 +160,7 @@ module ColumnsOnDemand
         missing_attribute_without_columns_on_demand(attr_name, *args)
       end
     end
-    
+
     def reload_with_columns_on_demand(*args)
       reload_without_columns_on_demand(*args).tap do
         columns_loaded.clear
@@ -161,7 +177,7 @@ module ColumnsOnDemand
     end
   end
 
-  module RelationMethods
+  module RelationMethodsArity2
     def build_select_with_columns_on_demand(arel, selects)
       if selects.empty? && klass < ColumnsOnDemand::InstanceMethods
         build_select_without_columns_on_demand(arel, [default_select(true)])
@@ -170,10 +186,29 @@ module ColumnsOnDemand
       end
     end
   end
+
+  module RelationMethodsArity1
+    def build_select_with_columns_on_demand(arel)
+      if select_values.empty? && klass < ColumnsOnDemand::InstanceMethods
+        arel.project(*arel_columns([default_select(true)]))
+      else
+        build_select_without_columns_on_demand(arel)
+        arel.project(*arel_columns(select_values.uniq))
+      end
+    end
+  end
 end
 
 ActiveRecord::Base.send(:extend, ColumnsOnDemand::BaseMethods)
+
 if ActiveRecord.const_defined?(:Relation)
-  ActiveRecord::Relation.send(:include, ColumnsOnDemand::RelationMethods)
+  if ActiveRecord::Relation.instance_method(:build_select).arity == 1
+    # 4.2.1 and above
+    ActiveRecord::Relation.send(:include, ColumnsOnDemand::RelationMethodsArity1)
+  else
+    # 4.2.0 and below
+    ActiveRecord::Relation.send(:include, ColumnsOnDemand::RelationMethodsArity2)
+  end
+
   ActiveRecord::Relation.alias_method_chain :build_select, :columns_on_demand
 end

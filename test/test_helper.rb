@@ -17,10 +17,9 @@ require 'active_record'
 require 'active_record/fixtures'
 
 begin
-  require 'ruby-debug'
-  Debugger.start
+  require 'byebug'
 rescue LoadError
-  # ruby-debug not installed, no debugging for you
+  # no debugging for you
 end
 
 ActiveRecord::Base.configurations = YAML::load(IO.read(File.join(File.dirname(__FILE__), "database.yml")))
