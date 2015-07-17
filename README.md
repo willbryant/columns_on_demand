@@ -30,18 +30,22 @@ or 1.8.7 as appropriate, and may still work for them.
 Example
 =======
 
-# Example.all will exclude the file_data and processing_log columns from the
-# SELECT query, and example.file_data and example.processing_log will load & cache
-# that individual column value for the record instance.
-class Example
-  columns_on_demand :file_data, :processing_log
-end
+`Example.all` will exclude the `file_data` and `processing_log` columns from the
+`SELECT` query, and `example.file_data` and `example.processing_log` will load & cache
+that individual column value for the record instance:
 
-# Scans the 'examples' table columns and registers all TEXT (:text) and BLOB (:binary)
-# columns for loading on demand.
-class Example
-  columns_on_demand
-end
+```ruby
+  class Example
+    columns_on_demand :file_data, :processing_log
+  end
+```
 
+Scans the `examples` table columns and registers all TEXT (`:text`) and BLOB (`:binary`) columns for loading on demand:
+
+```ruby
+  class Example
+    columns_on_demand
+  end
+```
 
 Copyright (c) 2008-2015 Will Bryant, Sekuda Ltd, released under the MIT license
