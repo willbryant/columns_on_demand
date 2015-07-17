@@ -21,7 +21,7 @@ Compatibility
 
 Supports mysql, mysql2, postgresql, and sqlite3.
 
-Currently tested against Rails 4.2.1, 4.2.0, 4.1.5, 4.0.9, 3.2.18, on Ruby 2.1.5.
+Currently tested against Rails 4.2.3, 4.1.12, 4.0.13, 3.2.18, on Ruby 2.1.5.
 
 Was also previously tested compatible with 2.3.14, 3.0.17, and 3.1.8 on Ruby 2.0.0
 or 1.8.7 as appropriate, and may still work for them.
