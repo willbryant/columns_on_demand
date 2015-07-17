@@ -192,8 +192,7 @@ module ColumnsOnDemand
       if select_values.empty? && klass < ColumnsOnDemand::InstanceMethods
         arel.project(*arel_columns([default_select(true)]))
       else
-        build_select_without_columns_on_demand(arel)
-        arel.project(*arel_columns(select_values.uniq))
+        build_select_without_columns_on_demand(arel)        
       end
     end
   end
