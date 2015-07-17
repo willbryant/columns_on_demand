@@ -48,4 +48,10 @@ Scans the `examples` table columns and registers all TEXT (`:text`) and BLOB (`:
   end
 ```
 
+Thanks
+======
+
+* Tim Connor (@tlconnor)
+* Tobias Matthies (@tobmatth)
+
 Copyright (c) 2008-2015 Will Bryant, Sekuda Ltd, released under the MIT license
