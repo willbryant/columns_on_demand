@@ -294,7 +294,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   test "it doesn't create duplicate columns in SELECT queries" do
     implicits = Arel::Table.new(:implicits)
     reference_sql = implicits.project(implicits[:id]).to_sql
-    select_sql = Implicit.select("id").to_sql    
+    select_sql = Implicit.select("#{Implicit.quoted_table_name}.#{Implicit.connection.quote_column_name("id")}").to_sql
     assert_equal select_sql, reference_sql
   end
 end
