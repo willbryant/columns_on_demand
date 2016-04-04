@@ -25,7 +25,7 @@ module ColumnsOnDemand
       end
       alias_method_chain   :missing_attribute,               :columns_on_demand
       alias_method_chain   :reload,                          :columns_on_demand
-      if ActiveRecord::AttributeMethods::Dirty.instance_methods.include?(:changed_attributes)
+      if ActiveRecord::AttributeMethods::Dirty.instance_methods.include?(:attribute_changed_in_place?)
         alias_method_chain :attribute_changed_in_place?,     :columns_on_demand
       elsif ActiveRecord::AttributeMethods::Dirty.instance_methods.include?(:changed_attributes)
         alias_method_chain :changed_in_place?,               :columns_on_demand
