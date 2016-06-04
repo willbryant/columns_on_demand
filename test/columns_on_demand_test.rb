@@ -166,6 +166,16 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     end
     assert_loaded record, :file_data
   end
+
+  test "it doesn't load the on demand columns with select *" do
+    record = Implicit.select(Implicit.arel_table[Arel.star]).first
+    assert_not_loaded record, "file_data"
+    assert_not_loaded record, "processing_log"
+
+    record = Implicit.select('*').first
+    assert_not_loaded record, "file_data"
+    assert_not_loaded record, "processing_log"
+  end
   
   test "it raises normal ActiveRecord::RecordNotFound if the record is deleted before the column load" do
     record = Implicit.first
@@ -246,6 +256,20 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     assert_equal "Here's some info.", parent.info
   end
   
+  test "it works on child records loaded from associations with includes" do
+    parent = Parent.includes(:children).first
+    child = parent.children.first
+    assert_not_loaded child, "test_data"
+    assert_equal "Some test data", child.test_data
+  end
+
+  test "it works on parent records loaded from associations with includes" do
+    child = Child.includes(:parent).first
+    parent = child.parent
+    assert_not_loaded parent, "info"
+    assert_equal "Here's some info.", parent.info
+  end
+
   test "it doesn't break validates_presence_of" do
     class ValidatedImplicit < ActiveRecord::Base
       self.table_name = "implicits"

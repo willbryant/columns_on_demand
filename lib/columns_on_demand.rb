@@ -179,7 +179,7 @@ module ColumnsOnDemand
 
   module RelationMethodsArity2
     def build_select_with_columns_on_demand(arel, selects)
-      if selects.empty? && klass < ColumnsOnDemand::InstanceMethods
+      if (selects.empty? || selects == [table[Arel.star]] || selects == ['*']) && klass < ColumnsOnDemand::InstanceMethods
         build_select_without_columns_on_demand(arel, [default_select(true)])
       else
         build_select_without_columns_on_demand(arel, selects)
@@ -189,7 +189,7 @@ module ColumnsOnDemand
 
   module RelationMethodsArity1
     def build_select_with_columns_on_demand(arel)
-      if select_values.empty? && klass < ColumnsOnDemand::InstanceMethods
+      if (select_values.empty? || select_values == [table[Arel.star]] || select_values == ['*']) && klass < ColumnsOnDemand::InstanceMethods
         arel.project(*arel_columns([default_select(true)]))
       else
         build_select_without_columns_on_demand(arel)        
