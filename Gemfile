@@ -11,3 +11,4 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'rails', ENV['RAILS_VERSION']
+gem 'nokogiri', '~> 1.6.7.2'
