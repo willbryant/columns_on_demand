@@ -43,7 +43,11 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
 
   fixtures :all
-  self.use_transactional_fixtures = true
+  if respond_to?(:use_transactional_tests=)
+    self.use_transactional_tests = true
+  else
+    self.use_transactional_fixtures = true
+  end
   
   test "it lists explicitly given columns for loading on demand" do
     assert_equal ["file_data", "processing_log", "original_filename"], Explicit.columns_to_load_on_demand
@@ -290,7 +294,11 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
 end
 
 class ColumnsOnDemandSchemaTest < ActiveSupport::TestCase
-  self.use_transactional_fixtures = false
+  if respond_to?(:use_transactional_tests=)
+    self.use_transactional_tests = false
+  else
+    self.use_transactional_fixtures = false
+  end
 
   test "it updates the select strings when columns are changed and the column information is reset" do
     ActiveRecord::Schema.define(:version => 1) do
