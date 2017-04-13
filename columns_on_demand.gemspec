@@ -45,4 +45,5 @@ EOF
   gem.add_development_dependency "mysql2"
   gem.add_development_dependency "pg"
   gem.add_development_dependency "sqlite3"
+  gem.add_development_dependency "byebug"
 end
