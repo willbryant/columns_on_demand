@@ -92,10 +92,10 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
 
     record = Implicit.first
     assert_not_loaded record, "file_data"
-    assert_equal nil, record.file_data
+    assert_nil record.file_data
     assert_loaded record, "file_data"
     assert_no_queries do
-      assert_equal nil, record.file_data
+      assert_nil record.file_data
     end
   end
   
