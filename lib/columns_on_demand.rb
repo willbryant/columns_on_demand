@@ -84,10 +84,11 @@ module ColumnsOnDemand
     def load_attributes(*attr_names)
       return if attr_names.blank?
 
+      id_value = self.class.method(:quote_value).arity == 1 ? self.class.quote_value(id) : self.class.quote_value(id, self.class.columns_hash[self.class.primary_key])
       values = self.class.connection.select_rows(
         "SELECT #{attr_names.collect {|attr_name| self.class.connection.quote_column_name(attr_name)}.join(", ")}" +
         "  FROM #{self.class.quoted_table_name}" +
-        " WHERE #{self.class.connection.quote_column_name(self.class.primary_key)} = #{self.class.quote_value(id, self.class.columns_hash[self.class.primary_key])}")
+        " WHERE #{self.class.connection.quote_column_name(self.class.primary_key)} = #{id_value}")
       row = values.first || raise(ActiveRecord::RecordNotFound, "Couldn't find #{self.class.name} with ID=#{id}")
 
       attr_names.each_with_index do |attr_name, i|
