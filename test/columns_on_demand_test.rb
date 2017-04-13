@@ -195,33 +195,6 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     assert_equal "This is the file data!", record.file_data # check it doesn't raise
   end
   
-  test "it updates the select strings when columns are changed and the column information is reset" do
-    ActiveRecord::Schema.define(:version => 1) do
-      create_table :dummies, :force => true do |t|
-        t.string   :some_field
-        t.binary   :big_field
-      end
-    end
-
-    class Dummy < ActiveRecord::Base
-      columns_on_demand
-    end
-
-    assert_match(/\W*id\W*, \W*some_field\W*/, Dummy.default_select(false))
-
-    ActiveRecord::Schema.define(:version => 2) do
-      create_table :dummies, :force => true do |t|
-        t.string   :some_field
-        t.binary   :big_field
-        t.string   :another_field
-      end
-    end
-
-    assert_match(/\W*id\W*, \W*some_field\W*/, Dummy.default_select(false))
-    Dummy.reset_column_information
-    assert_match(/\W*id\W*, \W*some_field\W*, \W*another_field\W*/, Dummy.default_select(false))
-  end
-  
   test "it handles STI models" do
     class Sti < ActiveRecord::Base
       columns_on_demand
@@ -313,5 +286,36 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     reference_sql = implicits.project(implicits[:id]).to_sql
     select_sql = Implicit.select("#{Implicit.quoted_table_name}.#{Implicit.connection.quote_column_name("id")}").to_sql
     assert_equal select_sql, reference_sql
+  end
+end
+
+class ColumnsOnDemandSchemaTest < ActiveSupport::TestCase
+  self.use_transactional_fixtures = false
+
+  test "it updates the select strings when columns are changed and the column information is reset" do
+    ActiveRecord::Schema.define(:version => 1) do
+      create_table :dummies, :force => true do |t|
+        t.string   :some_field
+        t.binary   :big_field
+      end
+    end
+
+    class Dummy < ActiveRecord::Base
+      columns_on_demand
+    end
+
+    assert_match(/\W*id\W*, \W*some_field\W*/, Dummy.default_select(false))
+
+    ActiveRecord::Schema.define(:version => 2) do
+      create_table :dummies, :force => true do |t|
+        t.string   :some_field
+        t.binary   :big_field
+        t.string   :another_field
+      end
+    end
+
+    assert_match(/\W*id\W*, \W*some_field\W*/, Dummy.default_select(false))
+    Dummy.reset_column_information
+    assert_match(/\W*id\W*, \W*some_field\W*, \W*another_field\W*/, Dummy.default_select(false))
   end
 end
