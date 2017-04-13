@@ -54,11 +54,11 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
   
   test "it selects all the other columns for loading eagerly" do
-    assert_match /\W*id\W*, \W*results\W*, \W*processed_at\W*/, Explicit.default_select(false)
-    assert_match /\W*explicits\W*.results/, Explicit.default_select(true)
+    assert_match(/\W*id\W*, \W*results\W*, \W*processed_at\W*/, Explicit.default_select(false))
+    assert_match(/\W*explicits\W*.results/, Explicit.default_select(true))
     
-    assert_match /\W*id\W*, \W*original_filename\W*, \W*processed_at\W*/, Implicit.default_select(false)
-    assert_match /\W*implicits\W*.original_filename/, Implicit.default_select(true)
+    assert_match(/\W*id\W*, \W*original_filename\W*, \W*processed_at\W*/, Implicit.default_select(false))
+    assert_match(/\W*implicits\W*.original_filename/, Implicit.default_select(true))
   end
   
   test "it doesn't load the columns_to_load_on_demand straight away when finding the records" do
@@ -156,6 +156,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
 
     assert_not_loaded record, "file_data"
     assert_equal "New file data", record.file_data
+    assert_not_equal old_object_id, record.file_data.object_id
   end
   
   test "it doesn't override custom select() finds" do
@@ -206,7 +207,7 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
       columns_on_demand
     end
 
-    assert_match /\W*id\W*, \W*some_field\W*/, Dummy.default_select(false)
+    assert_match(/\W*id\W*, \W*some_field\W*/, Dummy.default_select(false))
 
     ActiveRecord::Schema.define(:version => 2) do
       create_table :dummies, :force => true do |t|
@@ -216,9 +217,9 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
       end
     end
 
-    assert_match /\W*id\W*, \W*some_field\W*/, Dummy.default_select(false)
+    assert_match(/\W*id\W*, \W*some_field\W*/, Dummy.default_select(false))
     Dummy.reset_column_information
-    assert_match /\W*id\W*, \W*some_field\W*, \W*another_field\W*/, Dummy.default_select(false)
+    assert_match(/\W*id\W*, \W*some_field\W*, \W*another_field\W*/, Dummy.default_select(false))
   end
   
   test "it handles STI models" do
@@ -238,8 +239,8 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
       columns_on_demand :some_field
     end
 
-    assert_match /\W*id\W*, \W*type\W*, \W*some_field\W*/, Sti.default_select(false)
-    assert_match /\W*id\W*, \W*type\W*, \W*big_field\W*/,  StiChild.default_select(false)
+    assert_match(/\W*id\W*, \W*type\W*, \W*some_field\W*/, Sti.default_select(false))
+    assert_match(/\W*id\W*, \W*type\W*, \W*big_field\W*/,  StiChild.default_select(false))
   end
   
   test "it works on child records loaded from associations" do
