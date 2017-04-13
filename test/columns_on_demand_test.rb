@@ -223,14 +223,6 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   end
   
   test "it handles STI models" do
-    ActiveRecord::Schema.define(:version => 1) do
-      create_table :stis, :force => true do |t|
-        t.string   :type
-        t.string   :some_field
-        t.binary   :big_field
-      end
-    end
-
     class Sti < ActiveRecord::Base
       columns_on_demand
     end

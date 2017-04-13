@@ -27,4 +27,10 @@ ActiveRecord::Schema.define(:version => 0) do
   create_table :serializings, :force => true do |t|
     t.binary   :data
   end
+
+  create_table :stis, :force => true do |t|
+    t.string   :type
+    t.string   :some_field
+    t.binary   :big_field
+  end
 end
