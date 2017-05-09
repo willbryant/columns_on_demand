@@ -68,8 +68,6 @@ module ColumnsOnDemand
       attr_names.each_with_index do |attr_name, i|
         columns_loaded << attr_name
         value = row[i]
-
-        # activerecord 4.2 or later, which make it easy to replicate the normal typecasting and deserialization logic
         @attributes.write_from_database(attr_name, value)
       end
     end
