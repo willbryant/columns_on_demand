@@ -163,6 +163,26 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     assert_not_equal old_object_id, record.file_data.object_id
   end
   
+  test "it does not think the column has been loaded if a reloaded instance that has not loaded the attribute is saved" do
+    record = Implicit.first
+    record.update_attributes!(:file_data => "New file data")
+
+    record.reload
+    record.save!
+
+    assert_equal "New file data", record.file_data
+  end
+
+  test "it does not think the column has been loaded if a fresh instance that has not loaded the attribute is saved" do
+    record = Implicit.first
+    record.update_attributes!(:file_data => "New file data")
+
+    record = Implicit.find(record.id)
+    record.save!
+
+    assert_equal "New file data", record.file_data
+  end
+
   test "it doesn't override custom select() finds" do
     record = Implicit.select("id, file_data").first
     klass = ActiveRecord.const_defined?(:MissingAttributeError) ? ActiveRecord::MissingAttributeError : ActiveModel::MissingAttributeError

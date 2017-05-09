@@ -136,3 +136,19 @@ end
 
 ActiveRecord::Base.send(:extend, ColumnsOnDemand::BaseMethods)
 ActiveRecord::Relation.send(:prepend, ColumnsOnDemand::RelationMethods)
+
+# work around ActiveRecord 5.0 and 5.1 converting uninitialized attributes to value nil on save
+# (due to dirty.rb mapping @attributes).  this is not only a problem for columns_on_demand as it
+# means that a MissingAttributeError will never be raised after save, but we suffer more.
+# ActiveRecord 4.2's Attribute doesn't have forgetting_assignment (or this problem).
+if ActiveRecord::Attribute.uninitialized(nil, nil).try(:forgetting_assignment).try(:initialized?)
+  module ActiveRecord
+    class Attribute # :nodoc:
+      class Uninitialized < Attribute # :nodoc:
+        def forgetting_assignment
+          dup
+        end
+      end
+    end
+  end
+end
