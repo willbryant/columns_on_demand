@@ -54,4 +54,4 @@ Thanks
 * Tobias Matthies (@tobmatth)
 * Phil Ross (@philr)
 
-Copyright (c) 2008-2017 Will Bryant, Sekuda Ltd, released under the MIT license
+Copyright (c) 2008-2018 Will Bryant, Sekuda Ltd, released under the MIT license
