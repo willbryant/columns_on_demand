@@ -41,7 +41,6 @@ EOF
 
   gem.add_dependency "activerecord"
   gem.add_development_dependency "rake"
-  gem.add_development_dependency "mysql"
   gem.add_development_dependency "mysql2"
   gem.add_development_dependency "pg"
   gem.add_development_dependency "sqlite3"
