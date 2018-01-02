@@ -14,7 +14,7 @@ module ColumnsOnDemand
     end
     
     def reset_column_information_with_columns_on_demand
-      @columns_to_select = nil
+      @columns_to_select = @columns_to_load_by_default = nil
       reset_column_information_without_columns_on_demand
     end
 
@@ -29,12 +29,16 @@ module ColumnsOnDemand
   module ClassMethods
     # this is the method API as called by ActiveRecord 2.x.  we also call it ourselves above in our ActiveRecord 3 extensions.
     def default_select(qualified)
-      @columns_to_select ||= (columns.collect(&:name) - columns_to_load_on_demand).collect {|attr_name| connection.quote_column_name(attr_name)}
+      @columns_to_select ||= columns_to_load_by_default.collect {|attr_name| connection.quote_column_name(attr_name)}
       if qualified
         quoted_table_name + '.' + @columns_to_select.join(", #{quoted_table_name}.")
       else
         @columns_to_select.join(", ")
       end
+    end
+
+    def columns_to_load_by_default
+      @columns_to_load_by_default ||= Set.new(columns.collect(&:name) - columns_to_load_on_demand)
     end
   end
   
@@ -48,7 +52,11 @@ module ColumnsOnDemand
     end
 
     def attributes
-      load_attributes(*columns_to_load_on_demand.reject {|attr_name| column_loaded?(attr_name)})
+      loaded_attributes = @attributes.keys
+      if loaded_attributes.size == self.class.columns_to_load_by_default.size &&
+         loaded_attributes.size == (self.class.columns_to_load_by_default & loaded_attributes).size
+        load_attributes(*columns_to_load_on_demand.reject {|attr_name| column_loaded?(attr_name)})
+      end
       super
     end
 

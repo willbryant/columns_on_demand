@@ -136,6 +136,18 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
       assert !attributes["processing_log"].blank?
     end
   end
+
+  test "it doesn't load the column when generating #attributes if not included in the select() list" do
+    attributes = Implicit.select("id, original_filename").first.attributes
+    assert_equal "somefile.txt", attributes["original_filename"]
+    assert !attributes.has_key?("file_data")
+  end
+
+  test "it loads the column when generating #attributes if included in the select() list" do
+    attributes = Implicit.select("id, original_filename, file_data").first.attributes
+    assert_equal "somefile.txt", attributes["original_filename"]
+    assert_equal "This is the file data!", attributes["file_data"]
+  end
   
   test "it loads the column when generating #to_json" do
     ActiveRecord::Base.include_root_in_json = true
