@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-# Declare your gem's dependencies in transaction_isolation_level.gemspec.
+# Declare your gem's dependencies in columns_on_demand.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
 gemspec
@@ -11,4 +11,3 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'rails', ENV['RAILS_VERSION']
-gem 'nokogiri', '~> 1.6.7.2'
