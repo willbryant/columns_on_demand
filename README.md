@@ -51,5 +51,6 @@ Thanks
 * Tim Connor (@tlconnor)
 * Tobias Matthies (@tobmatth)
 * Phil Ross (@philr)
+* Jens Schmidt (@w3dot0)
 
-Copyright (c) 2008-2018 Will Bryant, Sekuda Ltd, released under the MIT license
+Copyright (c) 2008-2020 Will Bryant, Sekuda Ltd, released under the MIT license
