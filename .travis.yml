@@ -1,0 +1,8 @@
+---
+sudo: false
+language: ruby
+cache: bundler
+dist: bionic
+rvm:
+  - 2.6
+script: ./test_all.sh
