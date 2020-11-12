@@ -5,4 +5,10 @@ cache: bundler
 dist: bionic
 rvm:
   - 2.6
+services:
+  - postgresql
+  - mysql
+before_script:
+  - createdb -U postgres columns_on_demand_test
+  - mysqladmin -u root create columns_on_demand_test
 script: ./test_all.sh
