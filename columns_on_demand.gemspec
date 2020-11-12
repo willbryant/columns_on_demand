@@ -19,14 +19,6 @@ pages since they are not stored wholly in the record's page itself.
 
 Although this plugin is mainly used for BLOB and TEXT columns, it will actually
 work on all types - and is just as useful for large string fields etc.
-
-
-Compatibility
-=============
-
-Supports mysql, mysql2, postgresql, and sqlite3.
-
-Currently tested against Rails 3.2.18, 4.0.8, and 4.1.4, on Ruby 2.0.0.
 EOF
   gem.author       = "Will Bryant"
   gem.email        = "will.bryant@gmail.com"
