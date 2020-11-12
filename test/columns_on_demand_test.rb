@@ -177,7 +177,8 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
   
   test "it does not think the column has been loaded if a reloaded instance that has not loaded the attribute is saved" do
     record = Implicit.first
-    record.update_attributes!(:file_data => "New file data")
+    record.file_data = "New file data"
+    record.save!
 
     record.reload
     record.save!
@@ -187,7 +188,8 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
 
   test "it does not think the column has been loaded if a fresh instance that has not loaded the attribute is saved" do
     record = Implicit.first
-    record.update_attributes!(:file_data => "New file data")
+    record.file_data = "New file data"
+    record.save!
 
     record = Implicit.find(record.id)
     record.save!
@@ -281,9 +283,9 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     
     assert !ValidatedImplicit.new(:original_filename => "test.txt").valid?
     instance = ValidatedImplicit.create!(:original_filename => "test.txt", :file_data => "test file data", :results => "test results")
-    instance.update_attributes!({}) # file_data and results are already loaded
+    assert instance.valid? # file_data and results are already loaded
     new_instance = ValidatedImplicit.find(instance.id)
-    new_instance.update_attributes!({}) # file_data and results aren't loaded yet, but will be loaded to validate
+    assert new_instance.valid? # file_data and results aren't loaded yet, but will be loaded to validate
   end
   
   test "it works with serialized columns" do
