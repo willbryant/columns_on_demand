@@ -107,6 +107,16 @@ module ColumnsOnDemand
       super(attr_name, &block)
     end
 
+    def write_attribute(attr_name, value)
+      ensure_loaded(attr_name)
+      super(attr_name, value)
+    end
+
+    def _write_attribute(attr_name, value)
+      ensure_loaded(attr_name)
+      super(attr_name, value)
+    end
+
     def missing_attribute(attr_name, *args)
       if columns_to_load_on_demand.include?(attr_name)
         load_attributes(attr_name)
