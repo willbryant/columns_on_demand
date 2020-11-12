@@ -10,7 +10,7 @@ do
 	RAILS_ENV=mysql2 bundle exec rake
 done
 
-for version in 6.0.3.4
+for version in 6.0.3.4 6.1.0.rc1
 do
 	RAILS_VERSION=$version SQLITE3_VERSION=1.4.1 bundle update rails sqlite3
 	RAILS_ENV=sqlite3 bundle exec rake
