@@ -148,6 +148,13 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     assert_equal "somefile.txt", attributes["original_filename"]
     assert_equal "This is the file data!", attributes["file_data"]
   end
+
+  test "it loads the column when changing its value" do
+    record = Implicit.first
+    record.file_data = 'This is the new file data!'
+    assert_equal "This is the file data!", record.file_data_was
+    assert_equal ["This is the file data!", "This is the new file data!"], record.changes[:file_data]
+  end
   
   test "it loads the column when generating #to_json" do
     ActiveRecord::Base.include_root_in_json = true
