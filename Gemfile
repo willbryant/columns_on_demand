@@ -11,3 +11,4 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'rails', ENV['RAILS_VERSION']
+gem 'sqlite3', ENV['SQLITE3_VERSION']

@@ -21,9 +21,7 @@ Compatibility
 
 Supports mysql, mysql2, postgresql, and sqlite3.
 
-Currently tested against Rails 5.2 (up to 5.2.0.beta2), 5.1 (up to 5.1.4), 5.0 (up to 5.0.6), and 4.2 (up to 4.2.10), on Ruby 2.3.6, 2.4.3, and 2.5.0.
-
-For earlier versions of Rails, use an older version of the gem.
+Currently tested against Rails 6.0.3.4, 5.2.4.4, 5.1.7, and 5.0.7.2, with older gem versions compatible with earlier Rails versions.
 
 
 Example
