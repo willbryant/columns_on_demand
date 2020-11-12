@@ -28,7 +28,6 @@ Supports mysql, mysql2, postgresql, and sqlite3.
 
 Currently tested against Rails 3.2.18, 4.0.8, and 4.1.4, on Ruby 2.0.0.
 EOF
-  gem.has_rdoc     = false
   gem.author       = "Will Bryant"
   gem.email        = "will.bryant@gmail.com"
   gem.homepage     = "http://github.com/willbryant/columns_on_demand"
