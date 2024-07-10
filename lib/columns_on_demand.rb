@@ -63,6 +63,14 @@ module ColumnsOnDemand
     def attribute_names
       (super + columns_to_load_on_demand).uniq.sort
     end
+
+    def attribute_method?(attr_name)
+      super || columns_to_load_on_demand.include?(attr_name)
+    end
+
+    def _has_attribute?(attr_name)
+      super || columns_to_load_on_demand.include?(attr_name)
+    end
     
     def load_attributes(*attr_names)
       return if attr_names.blank?

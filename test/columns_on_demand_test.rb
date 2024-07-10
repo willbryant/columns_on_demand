@@ -239,6 +239,18 @@ class ColumnsOnDemandTest < ActiveSupport::TestCase
     
     assert_equal "This is the file data!", record.file_data # check it doesn't raise
   end
+
+  test "it reports the columns in the class-level attribute_method?" do
+    assert(Implicit.attribute_method?("file_data"))
+  end
+
+  test "it reports the columns in the instance-level attribute_method?" do
+    assert(Implicit.first.send(:attribute_method?, "file_data"))
+  end
+
+  test "it makes the instance classes respond_to the attribute even if not loaded" do
+    assert(Implicit.first.respond_to?(:file_data))
+  end
   
   test "it handles STI models" do
     class Sti < ActiveRecord::Base
