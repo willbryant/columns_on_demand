@@ -1,11 +1,9 @@
 mysql:
   adapter: mysql
   database: columns_on_demand_test
-  username: root
 mysql2:
   adapter: mysql2
   database: columns_on_demand_test
-  username: root
 postgresql:
   adapter: postgresql
   database: columns_on_demand_test

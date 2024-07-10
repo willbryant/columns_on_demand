@@ -21,7 +21,7 @@ Compatibility
 
 Supports mysql, mysql2, postgresql, and sqlite3.
 
-Currently tested against Rails 6.1.0.rc1, 6.0.3.4, 5.2.4.4, 5.1.7, and 5.0.7.2, with older gem versions compatible with earlier Rails versions.
+Currently tested against Rails 7.2.0.beta2, 7.1.3.4, 7.0.8.4, and 6.1.7.8, with older gem versions compatible with earlier Rails versions.
 
 
 Example
@@ -53,4 +53,4 @@ Thanks
 * Phil Ross (@philr)
 * Jens Schmidt (@w3dot0)
 
-Copyright (c) 2008-2020 Will Bryant, Sekuda Ltd, released under the MIT license
+Copyright (c) 2008-2024 Will Bryant, Sekuda Ltd, released under the MIT license
